@@ -1,0 +1,135 @@
+﻿@model EducaEFRT.Models.LoginViewModel
+@{
+    Layout = null;
+    ViewBag.Title = "Iniciar sesión";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - EduControl</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .login-header h2 {
+                color: #333;
+                font-weight: bold;
+            }
+
+        .form-control {
+            height: 45px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: #4a6fdc;
+            border: none;
+            height: 45px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+            .btn-primary:hover {
+                background-color: #3a5bc7;
+            }
+
+        .remember-me {
+            margin: 15px 0;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+            .forgot-password a {
+                color: #666;
+                text-decoration: none;
+            }
+
+                .forgot-password a:hover {
+                    color: #4a6fdc;
+                    text-decoration: underline;
+                }
+
+        .validation-summary-errors {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .field-validation-error {
+            color: #dc3545;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container body-content">
+        <div class="login-container">
+            <div class="login-header">
+                <h2>SISTEMA EduControl</h2>
+            </div>
+
+            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login-form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(true, "", new { @class = "validation-summary-errors" })
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Username, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "Nombre de usuario" })
+                    @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Contraseña" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group remember-me">
+                    @Html.CheckBoxFor(m => m.RememberMe)
+                    @Html.LabelFor(m => m.RememberMe)
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="INGRESAR" class="btn btn-primary btn-block" />
+                </div>
+
+                <div class="forgot-password">
+                    @Html.ActionLink("¿Olvidaste tu contraseña?", "ForgotPassword")
+                </div>
+            }
+        </div>
+    </div>
+
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

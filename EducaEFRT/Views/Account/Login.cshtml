@@ -12,120 +12,227 @@
     <title>@ViewBag.Title - EduControl</title>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <style>
+        :root {
+            --primary-color: #4a6fdc;
+            --primary-hover: #3a5bc7;
+            --dark-bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text-color: #e6e6e6;
+            --input-bg: #0f3460;
+            --error-color: #ff6b6b;
+        }
+
         body {
-            background-color: #f5f5f5;
+            background-color: var(--dark-bg);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-color);
         }
 
         .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 30px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
 
         .login-header {
-            text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
             .login-header h2 {
-                color: #333;
-                font-weight: bold;
+                font-weight: 700;
+                font-size: 28px;
+                margin: 0;
+                color: #fff;
+                letter-spacing: 1px;
             }
 
-        .form-control {
-            height: 45px;
-
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            font-size: 16px;
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .btn-primary {
-            background-color: #4a6fdc;
-            border: none;
-            height: 45px;
+        .form-group {
+            width: 100%;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 10px;
+            text-align: left;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 500;
+            color: var(--text-color);
+            width: 100%;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-control {
+            width: 100%;
+            max-width: 320px;
+            height: 50px;
+            border-radius: 6px;
+            border: 2px solid #2d4059;
+            padding: 12px 15px;
+            font-size: 16px;
+            margin: 0 auto;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(74, 111, 220, 0.2);
+                outline: none;
+            }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            height: 50px;
+            font-size: 17px;
+            font-weight: 600;
+            width: 100%;
+            max-width: 320px;
+            margin: 20px auto;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
         }
 
             .btn-primary:hover {
-                background-color: #3a5bc7;
+                background-color: var(--primary-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             }
 
         .remember-me {
             margin: 15px 0;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
         }
+
+            .remember-me label {
+                margin-left: 8px;
+                margin-bottom: 0;
+                font-size: 15px;
+                color: #b8b8b8;
+                cursor: pointer;
+            }
+
+            .remember-me input {
+                width: 18px;
+                height: 18px;
+                cursor: pointer;
+            }
 
         .forgot-password {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
             .forgot-password a {
-                color: #666;
+                color: #a2a2a2;
                 text-decoration: none;
+                font-size: 15px;
+                transition: color 0.3s ease;
             }
 
                 .forgot-password a:hover {
-                    color: #4a6fdc;
+                    color: var(--primary-color);
                     text-decoration: underline;
                 }
 
         .validation-summary-errors {
-            color: #dc3545;
-            margin-bottom: 15px;
+            color: var(--error-color);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 15px;
+            padding: 10px;
+            background-color: rgba(255, 107, 107, 0.1);
+            border-radius: 6px;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
+            .validation-summary-errors ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
         .field-validation-error {
-            color: #dc3545;
+            color: var(--error-color);
             font-size: 14px;
+            display: block;
+            text-align: left;
+            max-width: 320px;
+            margin: 5px auto 0;
+            font-weight: 500;
+        }
+
+        .text-danger {
+            color: var(--error-color) !important;
         }
     </style>
 </head>
 <body>
-    <div class="container body-content">
-        <div class="login-container">
-            <div class="login-header">
-                <h2>SISTEMA EduControl</h2>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>SISTEMA EduControl</h2>
+        </div>
+
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login-form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(true, "", new { @class = "validation-summary-errors" })
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Username, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "Ingrese su nombre de usuario" })
+                @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
             </div>
 
-            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login-form" }))
-            {
-                @Html.AntiForgeryToken()
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Ingrese su contraseña" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+            </div>
 
-                @Html.ValidationSummary(true, "", new { @class = "validation-summary-errors" })
+            <div class="form-group remember-me">
+                @Html.CheckBoxFor(m => m.RememberMe)
+                @Html.LabelFor(m => m.RememberMe)
+            </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Username, new { @class = "control-label" })
-                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "Nombre de usuario" })
-                    @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
-                </div>
+            <div class="form-group">
+                <input type="submit" value="INGRESAR" class="btn btn-primary" />
+            </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Password, new { @class = "control-label" })
-                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Contraseña" })
-                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
-                </div>
-
-                <div class="form-group remember-me">
-                    @Html.CheckBoxFor(m => m.RememberMe)
-                    @Html.LabelFor(m => m.RememberMe)
-                </div>
-
-                <div class="form-group">
-                    <input type="submit" value="INGRESAR" class="btn btn-primary btn-block" />
-                </div>
-
-                <div class="forgot-password">
-                    @Html.ActionLink("¿Olvidaste tu contraseña?", "ForgotPassword")
-                </div>
-            }
-        </div>
+            <div class="forgot-password">
+                @Html.ActionLink("¿Olvidaste tu contraseña?", "ForgotPassword")
+            </div>
+        }
     </div>
 
     <script src="~/Scripts/jquery-3.4.1.min.js"></script>

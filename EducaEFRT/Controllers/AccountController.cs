@@ -37,7 +37,10 @@ namespace EducaEFRT.Controllers
                     if (usuario != null)
                     {
                         FormsAuthentication.SetAuthCookie(model.Username, model.RememberMe);
-                        return RedirectToLocal(returnUrl);
+                        Session["IdUsuario"] = usuario.IdUsuario;
+                        Session["NombreUsuario"] = usuario.Username;
+                        // Redirige a la acción de cursos asignados
+                        return RedirectToAction("CursosAsignados", "Docente");
                     }
                 }
 

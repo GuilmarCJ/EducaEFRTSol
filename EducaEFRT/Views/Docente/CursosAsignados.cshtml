@@ -1,0 +1,40 @@
+﻿@model List<EducaEFRT.Models.DB.Repositories.AsignacionCursoViewModel>
+@{
+    ViewBag.Title = "Menú principal";
+    var nombreUsuario = ViewBag.NombreUsuario as string;
+}
+
+@if (!Model.Any())
+{
+    <div style="color:red; font-weight:bold;">No se encontraron cursos asignados para este docente.</div>
+}
+
+<div style="text-align:center; margin-top:20px;">
+    <h1 style="font-weight:bold;">SISTEMA EduControl</h1>
+    <div style="position:absolute; top:20px; right:40px;">
+        <a href="@Url.Action("Logout", "Account")">Cerrar sesión</a>
+    </div>
+    <h3 style="margin-top:40px;">Bienvenido, profesor <span style="text-transform:uppercase;">@nombreUsuario</span></h3>
+</div>
+
+<div style="margin:40px auto; width:90%; max-width:900px;">
+    <fieldset style="border:1px solid #aaa; padding:20px;">
+        <legend style="font-weight:bold;">Cursos asignados</legend>
+        <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center;">
+            @foreach (var curso in Model)
+            {
+                <div style="border:1px solid #888; border-radius:8px; width:300px; padding:16px; margin-bottom:20px;">
+                    <h4 style="font-weight:bold;">@curso.NombreCurso</h4>
+                    <p>Sección: <b>@curso.NombreSeccion</b></p>
+                    <p>Turno: <b>@curso.NombreTurno</b></p>
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                        <a class="btn btn-outline-primary" href="#">REGISTRAR ASISTENCIA</a>
+                        <a class="btn btn-outline-secondary" href="#">REGISTRAR NOTAS</a>
+                        <a class="btn btn-outline-info" href="#">LISTA DE ESTUDIANTES</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </fieldset>
+</div>
+

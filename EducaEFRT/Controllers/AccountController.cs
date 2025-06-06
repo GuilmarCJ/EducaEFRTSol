@@ -37,8 +37,25 @@ namespace EducaEFRT.Controllers
                     if (usuario != null)
                     {
                         FormsAuthentication.SetAuthCookie(model.Username, model.RememberMe);
-                        return RedirectToLocal(returnUrl);
+                        Session["IdUsuario"] = usuario.IdUsuario;
+                        Session["NombreUsuario"] = usuario.Username;
+                        Session["Rol"] = usuario.Rol;
+
+                        if (usuario.Rol == "Docente")
+                        {
+                            return RedirectToAction("CursosAsignados", "Docente");
+                        }
+                        else if (usuario.Rol == "Administrador")
+                        {
+                            return RedirectToAction("PanelAdmin", "Admin");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "Rol no reconocido.");
+                            return View(model);
+                        }
                     }
+
                 }
 
                 ModelState.AddModelError("", "Nombre de usuario o contraseña incorrectos.");
@@ -58,7 +75,7 @@ namespace EducaEFRT.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
         }
 
         [HttpPost]
@@ -66,7 +83,7 @@ namespace EducaEFRT.Controllers
         public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
+using EducaEFRT.Models;
+
 
 namespace EducaEFRT.Models.DB
 {
@@ -16,6 +18,18 @@ namespace EducaEFRT.Models.DB
         }
 
         public virtual DbSet<Usuario> Usuarios { get; set; }
+        public virtual DbSet<Docente> Docentes { get; set; }
+        public virtual DbSet<AdministradorSistema> AdministradoresSistema { get; set; }
+        public virtual DbSet<Curso> Cursos { get; set; }
+        public virtual DbSet<Seccion> Secciones { get; set; }
+        public virtual DbSet<Turno> Turnos { get; set; }
+        public virtual DbSet<Estudiante> Estudiantes { get; set; }
+        public virtual DbSet<AsignacionCurso> AsignacionesCurso { get; set; }
+        public virtual DbSet<AsistenciaDocente> AsistenciasDocente { get; set; }
+        public virtual DbSet<Matricula> Matriculas { get; set; }
+        public virtual DbSet<AsistenciaEstudiante> AsistenciasEstudiante { get; set; }
+        public virtual DbSet<Notas> Notas { get; set; }
+        public IEnumerable<object> AsignacionCurso { get; internal set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

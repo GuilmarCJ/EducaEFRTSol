@@ -108,7 +108,7 @@
         <h1 style="font-weight:bold;">SISTEMA EduControl</h1>
         <!-- Ícono + cerrar sesión en esquina superior derecha -->
         <div id="topBar" style="position: fixed; top: 10px; right: 10px; display: flex; align-items: center; gap: 10px; z-index: 1050; transition: top 0.3s;">
-            <i class="bi bi-person-circle fs-3 text-primary"></i>
+            <span style="text-transform:uppercase;">@nombreUsuario</span><i class="bi bi-person-circle fs-3 text-primary"></i>
             <form action="@Url.Action("Logout", "Account")" method="post" id="logoutForm" style="margin: 0;">
                 @Html.AntiForgeryToken()
                 <button type="submit" class="btn btn-sm btn-outline-danger">Cerrar sesión</button>

@@ -25,7 +25,7 @@ public class AsistenciaDocenteRepository : IDisposable
             IdAsignacion = idAsignacion,
             Fecha = hoy,
             Hora = DateTime.Now.TimeOfDay,
-            EstadoAsistencia = "Asistio"
+            EstadoAsistencia = "A"
         };
 
         db.AsistenciasDocente.Add(asistencia);

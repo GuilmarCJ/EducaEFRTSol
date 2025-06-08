@@ -22,5 +22,6 @@ namespace EducaEFRT.Models
         [Required]
         [Column("id_asignacion")]
         public int IdAsignacion { get; set; }
+        public virtual Estudiante Estudiante{ get; set; }
     }
 }

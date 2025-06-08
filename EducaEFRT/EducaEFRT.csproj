@@ -140,6 +140,7 @@
     <Compile Include="Models\DB\EduControlDB.cs" />
     <Compile Include="Models\DB\Repositories\AsistenciaDocenteRepository.cs" />
     <Compile Include="Models\DB\Repositories\AsignacionCursoRepository.cs" />
+    <Compile Include="Models\DB\Repositories\NotasRepository.cs" />
     <Compile Include="Models\DB\Repositories\UsuarioRepository.cs" />
     <Compile Include="Models\Docente.cs" />
     <Compile Include="Models\Estudiante.cs" />
@@ -149,7 +150,9 @@
     <Compile Include="Models\Seccion.cs" />
     <Compile Include="Models\Turno.cs" />
     <Compile Include="Models\Usuario.cs" />
+    <Compile Include="Models\ViewModels\EstudianteNotasViewModel.cs" />
     <Compile Include="Models\ViewModels\RegistrarAsistenciaDocenteViewModel.cs" />
+    <Compile Include="Models\ViewModels\RegistrarNotasViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +211,7 @@
     <Content Include="Views\Docente\CursosAsignados.cshtml" />
     <Content Include="Views\Admin\PanelAdmin.cshtml" />
     <Content Include="Views\Docente\RegistrarAsistencia.cshtml" />
+    <Content Include="Views\Docente\RegistrarNotas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -95,6 +95,18 @@
             gap: 8px;
             margin-top: 10px;
         }
+        .alert {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
     </style>
 </head>
 <body>
@@ -113,11 +125,15 @@
                 @Html.AntiForgeryToken()
                 <button type="submit" class="btn btn-sm btn-outline-danger">Cerrar sesión</button>
             </form>
+
         </div>
-
-
-
         <h3 style="margin-top:40px;text-align:left;">Bienvenido, profesor <span style="text-transform:uppercase;">@nombreUsuario</span></h3>
+        @if (TempData["MensajeNotas"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                @TempData["MensajeNotas"]
+            </div>
+        }
         @if (TempData["MensajeAsistencia"] != null)
         {
             <div class="alert alert-info mt-3">
@@ -143,7 +159,10 @@
                                         REGISTRAR MI ASISTENCIA
                                     </button>
                                     <a class="btn btn-outline-info" href="#">LISTA DE ESTUDIANTES</a>
-                                    <a class="btn btn-outline-secondary" href="#">REGISTRAR NOTAS</a>
+                                    <a class="btn btn-outline-secondary"
+                                       href="@Url.Action("RegistrarNotas", "Docente", new { idAsignacion = curso.IdAsignacion })">
+                                        REGISTRAR NOTAS
+                                    </a>
                                 </div>
                             </div>
                         }

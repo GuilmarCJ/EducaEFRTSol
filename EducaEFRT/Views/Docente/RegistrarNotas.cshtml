@@ -1,0 +1,121 @@
+﻿@model EducaEFRT.Models.ViewModels.RegistrarNotasViewModel
+@{
+    ViewBag.Title = "Registrar Notas";
+}
+<style>
+    /* Estilo para el buscador */
+    .input-group {
+        max-width: 1200px;
+    }
+</style>
+@if (TempData["MensajeNotas"] != null)
+{
+    <div class="alert alert-info">@TempData["MensajeNotas"]</div>
+}
+<div class="container mt-4">
+    <h1 style="text-align:center">Registrar Notas</h1>
+    <h3>Curso: @Model.NombreCurso | Seccion:(@Model.Seccion) | Turno:@Model.Turno</h3>
+
+
+    @using (Html.BeginForm("RegistrarNotas", "Docente", FormMethod.Get))
+    {
+        @Html.Hidden("idAsignacion", Model.IdAsignacion)
+
+<div class="input-group">
+    @Html.TextBox("codigoBusqueda", Model.CodigoBusqueda,
+        new
+             {
+            @class = "form-control",
+            placeholder = "Buscar por código",
+        })
+
+    <button type="submit" class="btn btn-primary">
+        Buscar
+    </button>
+        <div class="d-inline-block ms-2">
+            <a href="@Url.Action("RegistrarNotas", new { idAsignacion = Model.IdAsignacion })"
+               class="btn btn-danger">
+                Limpiar
+            </a>
+        </div>
+</div>
+    }
+    <br>
+
+    <form asp-action="RegistrarNotas" method="post">
+        <input type="hidden" asp-for="IdAsignacion" />
+
+        <table class="table table-bordered table-hover">
+            <thead class="table-primary">
+                <tr>
+                    <th>Código</th>
+                    <th>Estudiante</th>
+                    <th>Nota T1 (25%)</th>
+                    <th>Nota T2 (25%)</th>
+                    <th>Ex. Final (50%)</th>
+                    <th>Promedio</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Estudiantes.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.Estudiantes[i].CodigoEstudiante</td>
+                        <td>@Model.Estudiantes[i].NombreCompleto</td>
+                        <td>
+                            @Html.HiddenFor(m => m.Estudiantes[i].IdMatricula)
+
+                            <!-- Campo para Nota T1 con validación -->
+                            @Html.TextBoxFor(m => m.Estudiantes[i].NotaT1,
+                                           new { @class = "form-control", type = "number", step = "0.01" })
+                            @Html.ValidationMessageFor(m => m.Estudiantes[i].NotaT1, "",
+                                                    new { @class = "text-danger small" })
+                        </td>
+                        <td>
+                            <!-- Campo para Nota T2 con validación -->
+                            @Html.TextBoxFor(m => m.Estudiantes[i].NotaT2,
+                                           new { @class = "form-control", type = "number", step = "0.01" })
+                            @Html.ValidationMessageFor(m => m.Estudiantes[i].NotaT2, "",
+                                                    new { @class = "text-danger small" })
+                        </td>
+                        <td>
+                            <!-- Campo para Examen Final con validación -->
+                            @Html.TextBoxFor(m => m.Estudiantes[i].NotaEF,
+                                           new { @class = "form-control", type = "number", step = "0.01" })
+                            @Html.ValidationMessageFor(m => m.Estudiantes[i].NotaEF, "",
+                                                    new { @class = "text-danger small" })
+                        </td>
+                        <td>@Model.Estudiantes[i].Promedio</td>
+                        <td>@Model.Estudiantes[i].Estado</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success">Guardar Notas</button>
+        <a href="@Url.Action("CursosAsignados")" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+}
+<script>
+    $(document).ready(function () {
+        $('form').submit(function () {
+            var isValid = true;
+
+            $('input[type="number"]').each(function () {
+                var value = $(this).val();
+                if (value && !/^\d{1,2}(\.\d{1,2})?$/.test(value)) {
+                    alert('Formato de nota inválido: ' + value);
+                    isValid = false;
+                    return false;
+                }
+            });
+
+            return isValid;
+        });
+    });
+</script>

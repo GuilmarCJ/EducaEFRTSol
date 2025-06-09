@@ -17,6 +17,58 @@
         color: var(--text-color);
     }
 
+    .hora-box {
+        background: #222a44;
+        color: #fff;
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        padding: 18px 0;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        letter-spacing: 2px;
+        box-shadow: 0 2px 8px #0002;
+    }
+
+    .busqueda-box {
+        background: #16213e;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 400px;
+    }
+
+        .busqueda-box label {
+            color: #e6e6e6;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+
+        .busqueda-box input[type="text"] {
+            flex: 1;
+            padding: 7px 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .busqueda-box button {
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 7px 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            .busqueda-box button:hover {
+                background: #3a5bc7;
+            }
+
     .header-section {
         background-color: var(--section-bg);
         padding: 20px;
@@ -87,6 +139,16 @@
 </style>
 
 <div class="container">
+    <div class="hora-box">
+        <span id="hora-actual"></span>
+    </div>
+
+    <div class="busqueda-box">
+        <label for="busqueda-codigo">Código estudiante:</label>
+        <input type="text" id="busqueda-codigo" placeholder="Ingrese el código...">
+        <button type="button" id="btn-buscar">Buscar</button>
+    </div>
+
     <div class="header-section">
         <h1 class="header-title">REGISTRO DE ASISTENCIA</h1>
         <p class="course-info">Curso: @Model.NombreCurso</p>
@@ -102,7 +164,7 @@
         @Html.HiddenFor(m => m.Turno)
 
         <div class="table-container">
-            <table class="table">
+            <table class="table" id="tabla-estudiantes">
                 <thead>
                     <tr>
                         <th>Código</th>
@@ -117,7 +179,7 @@
                     @for (int i = 0; i < Model.Estudiantes.Count; i++)
                     {
                         <tr>
-                            <td>@Model.Estudiantes[i].CodigoEstudiante</td>
+                            <td class="codigo-estudiante">@Model.Estudiantes[i].CodigoEstudiante</td>
                             <td>@Model.Estudiantes[i].Apellidos</td>
                             <td>@Model.Estudiantes[i].Nombres</td>
                             <td class="checkbox-cell">
@@ -126,15 +188,15 @@
                                 @Html.HiddenFor(m => m.Estudiantes[i].Apellidos)
                                 @Html.HiddenFor(m => m.Estudiantes[i].Nombres)
                                 @Html.CheckBoxFor(m => m.Estudiantes[i].Asistio,
-                                    new { @class = "checkbox-lg asistencia-checkbox", id = $"asistio_{i}" })
+                                         new { @class = "checkbox-lg asistencia-checkbox", id = $"asistio_{i}" })
                             </td>
                             <td class="checkbox-cell">
                                 @Html.CheckBoxFor(m => m.Estudiantes[i].Tardanza,
-                                    new { @class = "checkbox-lg asistencia-checkbox", id = $"tardanza_{i}" })
+                                         new { @class = "checkbox-lg asistencia-checkbox", id = $"tardanza_{i}" })
                             </td>
                             <td class="checkbox-cell">
                                 @Html.CheckBoxFor(m => m.Estudiantes[i].Falto,
-                                    new { @class = "checkbox-lg asistencia-checkbox", id = $"falto_{i}" })
+                                         new { @class = "checkbox-lg asistencia-checkbox", id = $"falto_{i}" })
                             </td>
                         </tr>
                     }
@@ -150,6 +212,36 @@
 
 @section Scripts {
     <script>
+        // Actualizar la hora cada segundo
+        function actualizarHora() {
+            var ahora = new Date();
+            var hora = ahora.getHours().toString().padStart(2, '0') + ':' +
+                ahora.getMinutes().toString().padStart(2, '0') + ':' +
+                ahora.getSeconds().toString().padStart(2, '0');
+            document.getElementById('hora-actual').textContent = hora;
+        }
+        setInterval(actualizarHora, 1000);
+        actualizarHora();
+
+        // Buscar estudiante por código
+        function filtrarPorCodigo() {
+            var filtro = document.getElementById('busqueda-codigo').value.toLowerCase();
+            var filas = document.querySelectorAll('#tabla-estudiantes tbody tr');
+            filas.forEach(function (fila) {
+                var codigo = fila.querySelector('.codigo-estudiante').textContent.toLowerCase();
+                if (codigo.indexOf(filtro) > -1 || filtro === "") {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+        }
+        document.getElementById('btn-buscar').addEventListener('click', filtrarPorCodigo);
+        document.getElementById('busqueda-codigo').addEventListener('keyup', function (e) {
+            if (e.key === 'Enter') filtrarPorCodigo();
+        });
+
+        // El resto de tu script para checkboxes y validaciones
         $(document).ready(function () {
             // Solo permitir un checkbox marcado por fila
             $('.asistencia-checkbox').change(function () {
@@ -159,14 +251,12 @@
                 if ($(this).is(':checked')) {
                     checkboxes.not(this).prop('checked', false);
                 } else {
-                    // Si desmarcan el último, marcar Faltó por defecto
                     if (checkboxes.filter(':checked').length === 0) {
                         row.find('.asistencia-checkbox[id*="falto"]').prop('checked', true);
                     }
                 }
             });
 
-            // Inicializar - marcar Faltó por defecto
             $('.table tbody tr').each(function () {
                 var row = $(this);
                 if (row.find('.asistencia-checkbox:checked').length === 0) {
@@ -174,28 +264,25 @@
                 }
             });
 
-            // Validar antes de enviar
             $('form').submit(function (e) {
                 var isValid = true;
                 var errorMsg = "";
 
-                // Verificar que todos los estudiantes tengan una selección
                 $('.table tbody tr').each(function () {
                     var checkboxes = $(this).find('.asistencia-checkbox');
                     if (checkboxes.filter(':checked').length === 0) {
                         isValid = false;
                         errorMsg = "Debe marcar al menos una opción para cada estudiante";
-                        return false; // salir del each
+                        return false;
                     }
                 });
 
                 if (!isValid) {
                     alert(errorMsg);
-                    e.preventDefault(); // Evitar envío del formulario
+                    e.preventDefault();
                     return false;
                 }
 
-                // Confirmación antes de enviar
                 if (!confirm('¿Está seguro de guardar la asistencia?')) {
                     e.preventDefault();
                     return false;
@@ -206,3 +293,4 @@
         });
     </script>
 }
+ 

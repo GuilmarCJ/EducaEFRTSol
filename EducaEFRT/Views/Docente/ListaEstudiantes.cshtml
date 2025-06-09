@@ -1,0 +1,208 @@
+﻿@model EducaEFRT.Models.ViewModels.ListaAsistenciaViewModel
+@{
+    ViewBag.Title = "Registro de Asistencia";
+}
+
+<style>
+    :root {
+        --primary-color: #4a6fdc;
+        --dark-bg: #1a1a2e;
+        --card-bg: #16213e;
+        --text-color: #e6e6e6;
+        --section-bg: #0f3460;
+    }
+
+    body {
+        background-color: var(--dark-bg);
+        color: var(--text-color);
+    }
+
+    .header-section {
+        background-color: var(--section-bg);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .header-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 10px;
+    }
+
+    .course-info {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .table-container {
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        padding: 20px;
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        color: var(--text-color);
+    }
+
+        .table th {
+            background-color: var(--section-bg);
+            color: white;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .table td {
+            padding: 10px;
+            vertical-align: middle;
+            border-bottom: 1px solid #2d4059;
+        }
+
+    .checkbox-cell {
+        text-align: center;
+    }
+
+    .checkbox-lg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .btn-save {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 6px;
+        font-weight: bold;
+        border: none;
+        margin-top: 20px;
+    }
+
+        .btn-save:hover {
+            background-color: #3a5bc7;
+            color: white;
+        }
+</style>
+
+<div class="container">
+    <div class="header-section">
+        <h1 class="header-title">REGISTRO DE ASISTENCIA</h1>
+        <p class="course-info">Curso: @Model.NombreCurso</p>
+        <p class="course-info">Sección: @Model.Seccion</p>
+        <p class="course-info">Turno: @Model.Turno</p>
+    </div>
+
+    @using (Html.BeginForm())
+    {
+        @Html.HiddenFor(m => m.IdAsignacion)
+        @Html.HiddenFor(m => m.NombreCurso)
+        @Html.HiddenFor(m => m.Seccion)
+        @Html.HiddenFor(m => m.Turno)
+
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Apellidos</th>
+                        <th>Nombres</th>
+                        <th>Asistió</th>
+                        <th>Tardanza</th>
+                        <th>Faltó</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Estudiantes.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.Estudiantes[i].CodigoEstudiante</td>
+                            <td>@Model.Estudiantes[i].Apellidos</td>
+                            <td>@Model.Estudiantes[i].Nombres</td>
+                            <td class="checkbox-cell">
+                                @Html.HiddenFor(m => m.Estudiantes[i].IdMatricula)
+                                @Html.HiddenFor(m => m.Estudiantes[i].CodigoEstudiante)
+                                @Html.HiddenFor(m => m.Estudiantes[i].Apellidos)
+                                @Html.HiddenFor(m => m.Estudiantes[i].Nombres)
+                                @Html.CheckBoxFor(m => m.Estudiantes[i].Asistio,
+                                    new { @class = "checkbox-lg asistencia-checkbox", id = $"asistio_{i}" })
+                            </td>
+                            <td class="checkbox-cell">
+                                @Html.CheckBoxFor(m => m.Estudiantes[i].Tardanza,
+                                    new { @class = "checkbox-lg asistencia-checkbox", id = $"tardanza_{i}" })
+                            </td>
+                            <td class="checkbox-cell">
+                                @Html.CheckBoxFor(m => m.Estudiantes[i].Falto,
+                                    new { @class = "checkbox-lg asistencia-checkbox", id = $"falto_{i}" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn-save">Guardar Asistencia</button>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Solo permitir un checkbox marcado por fila
+            $('.asistencia-checkbox').change(function () {
+                var row = $(this).closest('tr');
+                var checkboxes = row.find('.asistencia-checkbox');
+
+                if ($(this).is(':checked')) {
+                    checkboxes.not(this).prop('checked', false);
+                } else {
+                    // Si desmarcan el último, marcar Faltó por defecto
+                    if (checkboxes.filter(':checked').length === 0) {
+                        row.find('.asistencia-checkbox[id*="falto"]').prop('checked', true);
+                    }
+                }
+            });
+
+            // Inicializar - marcar Faltó por defecto
+            $('.table tbody tr').each(function () {
+                var row = $(this);
+                if (row.find('.asistencia-checkbox:checked').length === 0) {
+                    row.find('.asistencia-checkbox[id*="falto"]').prop('checked', true);
+                }
+            });
+
+            // Validar antes de enviar
+            $('form').submit(function (e) {
+                var isValid = true;
+                var errorMsg = "";
+
+                // Verificar que todos los estudiantes tengan una selección
+                $('.table tbody tr').each(function () {
+                    var checkboxes = $(this).find('.asistencia-checkbox');
+                    if (checkboxes.filter(':checked').length === 0) {
+                        isValid = false;
+                        errorMsg = "Debe marcar al menos una opción para cada estudiante";
+                        return false; // salir del each
+                    }
+                });
+
+                if (!isValid) {
+                    alert(errorMsg);
+                    e.preventDefault(); // Evitar envío del formulario
+                    return false;
+                }
+
+                // Confirmación antes de enviar
+                if (!confirm('¿Está seguro de guardar la asistencia?')) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                return true;
+            });
+        });
+    </script>
+}

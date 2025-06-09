@@ -92,6 +92,102 @@ namespace EducaEFRT.Controllers
             return View(model);
         }
 
+           /* public ActionResult ListaEstudiantes(int idAsignacion)
+            {
+                if (Session["IdUsuario"] == null)
+                    return RedirectToAction("Login", "Account");
+
+                using (var repo = new EstudianteRepository())
+                {
+                    var model = repo.ObtenerListaEstudiantes(idAsignacion);
+
+                    if (model == null)
+                        return HttpNotFound();
+
+                    return View(model);
+                }
+            }*/
+
+
+            public ActionResult ListaEstudiantes(int idAsignacion)
+            {
+                if (Session["IdUsuario"] == null)
+                    return RedirectToAction("Login", "Account");
+
+                using (var repo = new AsistenciaRepository())
+                {
+                    var model = repo.ObtenerListaAsistencia(idAsignacion);
+
+                    if (model == null)
+                        return HttpNotFound();
+
+                    return View(model);
+                }
+            }
+
+        [HttpPost]
+        public ActionResult ListaEstudiantes(ListaAsistenciaViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    using (var repo = new AsistenciaRepository())
+                    {
+                        // Verificar que hay estudiantes para guardar
+                        if (model.Estudiantes == null || model.Estudiantes.Count == 0)
+                        {
+                            ModelState.AddModelError("", "No hay estudiantes para registrar asistencia");
+                            return View(model);
+                        }
+
+                        // Filtrar solo estudiantes con alguna opción seleccionada
+                        var estudiantesConAsistencia = model.Estudiantes
+                            .Where(e => e.Asistio || e.Tardanza || e.Falto)
+                            .ToList();
+
+                        if (estudiantesConAsistencia.Count == 0)
+                        {
+                            ModelState.AddModelError("", "Debe seleccionar al menos una opción de asistencia");
+                            return View(model);
+                        }
+
+                        if (repo.RegistrarAsistencia(estudiantesConAsistencia))
+                        {
+                            TempData["Mensaje"] = "Asistencia registrada correctamente";
+                            return RedirectToAction("CursosAsignados");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Loggear el error
+                    System.Diagnostics.Debug.WriteLine("Error al guardar asistencia: " + ex.ToString());
+
+                    // Mostrar mensaje de error más específico
+                    ModelState.AddModelError("", "Ocurrió un error al guardar la asistencia. Detalles: " + ex.Message);
+                }
+            }
+            else
+            {
+                // Agregar mensaje de error de validación del modelo
+                ModelState.AddModelError("", "Hay errores en los datos enviados");
+            }
+
+            // Si llegamos aquí, hubo un error - recargar los datos necesarios
+            using (var repo = new AsistenciaRepository())
+            {
+                var datosActuales = repo.ObtenerListaAsistencia(model.IdAsignacion);
+                if (datosActuales != null)
+                {
+                    model.NombreCurso = datosActuales.NombreCurso;
+                    model.Seccion = datosActuales.Seccion;
+                    model.Turno = datosActuales.Turno;
+                }
+            }
+
+            return View(model);
+        }
 
 
     }

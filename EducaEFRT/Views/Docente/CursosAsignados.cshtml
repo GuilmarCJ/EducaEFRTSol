@@ -142,7 +142,10 @@
                                             data-id="@curso.IdAsignacion" data-curso="@curso.NombreCurso" data-seccion="@curso.NombreSeccion" data-turno="@curso.NombreTurno">
                                         REGISTRAR MI ASISTENCIA
                                     </button>
-                                    <a class="btn btn-outline-info" href="#">LISTA DE ESTUDIANTES</a>
+                                    <a class="btn btn-outline-info"
+                                       href="@Url.Action("ListaEstudiantes", "Docente", new { idAsignacion = curso.IdAsignacion })">
+                                        LISTA DE ESTUDIANTES
+                                    </a>
                                     <a class="btn btn-outline-secondary" href="#">REGISTRAR NOTAS</a>
                                 </div>
                             </div>

@@ -1,0 +1,255 @@
+﻿@model List<EducaEFRT.Models.DB.Repositories.AsignacionCursoViewModel>
+@{
+    Layout = null; // Desactiva el uso de Layout
+    ViewBag.Title = "Panel Docente";
+    var nombreUsuario = ViewBag.NombreUsuario as string;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - EduControl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .body-content {
+            flex: 1 0 auto;
+            padding: 20px;
+            width: 90%; /* Ancho forzado personalizado */
+            margin: 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding: 10px 0;
+            background-color: #f9f9f9;
+        }
+
+        .contenedor {
+            margin: 40px auto;
+            width: 100%;
+        }
+
+        fieldset {
+            border: 1px solid #aaa;
+            border-radius: 6px;
+        }
+
+        legend {
+            font-weight: bold;
+            padding: 0 10px;
+            font-size: 1.2rem;
+        }
+
+        .fieldset-content {
+            padding: 20px 50px 30px 50px;
+        }
+
+        .cursos-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+        }
+
+        .curso-card {
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 300px;
+            padding: 16px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+            .curso-card h4 {
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+
+            .curso-card p {
+                margin: 5px 0;
+            }
+
+        .curso-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .alert {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="body-content">
+        @if (!Model.Any())
+        {
+            <div style="color:red; font-weight:bold;">No se encontraron cursos asignados para este docente.</div>
+        }
+
+    <div style="text-align:center; margin-top:20px;">
+        <h1 style="font-weight:bold;">SISTEMA EduControl</h1>
+        <!-- Ícono + cerrar sesión en esquina superior derecha -->
+        <div id="topBar" style="position: fixed; top: 10px; right: 10px; display: flex; align-items: center; gap: 10px; z-index: 1050; transition: top 0.3s;">
+            <span style="text-transform:uppercase;">@nombreUsuario</span><i class="bi bi-person-circle fs-3 text-primary"></i>
+            <form action="@Url.Action("Logout", "Account")" method="post" id="logoutForm" style="margin: 0;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-outline-danger">Cerrar sesión</button>
+            </form>
+
+        </div>
+        <h3 style="margin-top:40px;text-align:left;">Bienvenido, profesor <span style="text-transform:uppercase;">@nombreUsuario</span></h3>
+        @if (TempData["MensajeNotas"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                @TempData["MensajeNotas"]
+            </div>
+        }
+        @if (TempData["MensajeAsistencia"] != null)
+        {
+            <div class="alert alert-info mt-3">
+                @TempData["MensajeAsistencia"]
+            </div>
+        }
+    </div>
+
+        <div class="contenedor">
+            <fieldset>
+                <legend>Cursos asignados</legend>
+                <div class="fieldset-content">
+                    <div class="cursos-grid">
+                        @foreach (var curso in Model)
+                        {
+                            <div class="curso-card">
+                                <h4>@curso.NombreCurso</h4>
+                                <p>Sección: <b>@curso.NombreSeccion</b></p>
+                                <p>Turno: <b>@curso.NombreTurno</b></p>
+                                <div class="curso-links">
+                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalAsistencia"
+                                            data-id="@curso.IdAsignacion" data-curso="@curso.NombreCurso" data-seccion="@curso.NombreSeccion" data-turno="@curso.NombreTurno">
+                                        REGISTRAR MI ASISTENCIA
+                                    </button>
+                                    <a class="btn btn-outline-info" href="#">LISTA DE ESTUDIANTES</a>
+                                    <a class="btn btn-outline-secondary"
+                                       href="@Url.Action("RegistrarNotas", "Docente", new { idAsignacion = curso.IdAsignacion })">
+                                        REGISTRAR NOTAS
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; @DateTime.Now.Year - Sistema EduControl</p>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalAsistencia" tabindex="-1" aria-labelledby="modalAsistenciaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="formAsistencia" method="post" action="@Url.Action("RegistrarAsistencia", "Docente")">
+                    <div class="modal-header">
+                        <h5 class="modal-title w-100 text-center fw-bold fs-4" id="modalAsistenciaLabel">MI ASISTENCIA</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body d-flex justify-content-between align-items-start">
+                        <div style="flex: 1;">
+                            <input type="hidden" id="IdAsignacion" name="IdAsignacion" />
+                            <div><strong>Curso:</strong> <span id="Curso"></span></div>
+                            <div><strong>Sección:</strong> <span id="Seccion"></span></div>
+                            <div><strong>Turno:</strong> <span id="Turno"></span></div>
+                        </div>
+                        <div style="min-width: 150px; display: flex; justify-content: center; align-items: center;">
+                            <div id="clock" style="font-size: 3.0rem; font-weight: bold;"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Guardar Asistencia</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS de Bootstrap + reloj -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const modal = document.getElementById('modalAsistencia');
+        modal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            const idAsignacion = button.getAttribute('data-id');
+            const curso = button.getAttribute('data-curso');
+            const seccion = button.getAttribute('data-seccion');
+            const turno = button.getAttribute('data-turno');
+
+            modal.querySelector('#IdAsignacion').value = idAsignacion;
+            modal.querySelector('#Curso').textContent = curso;
+            modal.querySelector('#Seccion').textContent = seccion;
+            modal.querySelector('#Turno').textContent = turno;
+        });
+
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+    <script>
+        const topBar = document.getElementById("topBar");
+
+        window.addEventListener("scroll", function () {
+            if (window.scrollY === 0) {
+                // Mostrar solo si estamos completamente arriba
+                topBar.style.top = "10px";
+            } else {
+                // Ocultar en cualquier otra posición
+                topBar.style.top = "-60px";
+            }
+        });
+    </script>
+
+
+</body>
+</html>
+
+
+
+

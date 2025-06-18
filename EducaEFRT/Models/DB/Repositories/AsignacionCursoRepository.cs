@@ -39,7 +39,8 @@ namespace EducaEFRT.Models.DB.Repositories
                               IdAsignacion = ac.IdAsignacion, // Agregado
                               NombreCurso = c.NombreCurso,
                               NombreSeccion = s.NombreSeccion,
-                              NombreTurno = t.NombreTurno
+                              NombreTurno = t.NombreTurno,
+                              ImagenUrl = c.ImagenUrl
                           }).ToList();
 
             System.Diagnostics.Debug.WriteLine("Cursos encontrados: " + cursos.Count);
@@ -60,5 +61,7 @@ namespace EducaEFRT.Models.DB.Repositories
         public string NombreCurso { get; set; }
         public string NombreSeccion { get; set; }
         public string NombreTurno { get; set; }
+        public string ImagenUrl { get; set; }
+
     }
 }

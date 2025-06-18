@@ -18,5 +18,9 @@ namespace EducaEFRT.Models
         [Required]
         [Column("nombre_curso")]
         public string NombreCurso { get; set; }
+
+        [Column("imagen_url")]
+        public string ImagenUrl { get; set; }
+
     }
 }

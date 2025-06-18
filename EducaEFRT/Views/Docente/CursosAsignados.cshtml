@@ -95,6 +95,44 @@
             gap: 8px;
             margin-top: 10px;
         }
+
+        .curso-card {
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 300px;
+            padding: 0 0 16px 0; /* Quita padding arriba, solo abajo */
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
+            background: #fff;
+            overflow: hidden; /* Para que la imagen respete el borde redondeado */
+            display: flex;
+            flex-direction: column;
+        }
+
+            .curso-card img {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                margin-bottom: 0;
+                display: block;
+            }
+
+            .curso-card h4 {
+                font-weight: bold;
+                margin: 16px 16px 10px 16px;
+            }
+
+            .curso-card p {
+                margin: 5px 16px;
+            }
+
+        .curso-links {
+            margin: 10px 16px 0 16px;
+        }
+
     </style>
 </head>
 <body>
@@ -104,27 +142,27 @@
             <div style="color:red; font-weight:bold;">No se encontraron cursos asignados para este docente.</div>
         }
 
-    <div style="text-align:center; margin-top:20px;">
-        <h1 style="font-weight:bold;">SISTEMA EduControl</h1>
-        <!-- Ícono + cerrar sesión en esquina superior derecha -->
-        <div id="topBar" style="position: fixed; top: 10px; right: 10px; display: flex; align-items: center; gap: 10px; z-index: 1050; transition: top 0.3s;">
-            <i class="bi bi-person-circle fs-3 text-primary"></i>
-            <form action="@Url.Action("Logout", "Account")" method="post" id="logoutForm" style="margin: 0;">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-sm btn-outline-danger">Cerrar sesión</button>
-            </form>
-        </div>
-
-
-
-        <h3 style="margin-top:40px;text-align:left;">Bienvenido, profesor <span style="text-transform:uppercase;">@nombreUsuario</span></h3>
-        @if (TempData["MensajeAsistencia"] != null)
-        {
-            <div class="alert alert-info mt-3">
-                @TempData["MensajeAsistencia"]
+        <div style="text-align:center; margin-top:20px;">
+            <h1 style="font-weight:bold;">SISTEMA EduControl</h1>
+            <!-- Ícono + cerrar sesión en esquina superior derecha -->
+            <div id="topBar" style="position: fixed; top: 10px; right: 10px; display: flex; align-items: center; gap: 10px; z-index: 1050; transition: top 0.3s;">
+                <i class="bi bi-person-circle fs-3 text-primary"></i>
+                <form action="@Url.Action("Logout", "Account")" method="post" id="logoutForm" style="margin: 0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Cerrar sesión</button>
+                </form>
             </div>
-        }
-    </div>
+
+
+
+            <h3 style="margin-top:40px;text-align:left;">Bienvenido, profesor <span style="text-transform:uppercase;">@nombreUsuario</span></h3>
+            @if (TempData["MensajeAsistencia"] != null)
+            {
+                <div class="alert alert-info mt-3">
+                    @TempData["MensajeAsistencia"]
+                </div>
+            }
+        </div>
 
         <div class="contenedor">
             <fieldset>
@@ -134,6 +172,7 @@
                         @foreach (var curso in Model)
                         {
                             <div class="curso-card">
+                                <img src="@curso.ImagenUrl" alt="Imagen del curso" style="width:100%;height:140px;object-fit:cover;border-radius:6px 6px 0 0;" />
                                 <h4>@curso.NombreCurso</h4>
                                 <p>Sección: <b>@curso.NombreSeccion</b></p>
                                 <p>Turno: <b>@curso.NombreTurno</b></p>
@@ -236,7 +275,6 @@
 
 </body>
 </html>
-
 
 
 

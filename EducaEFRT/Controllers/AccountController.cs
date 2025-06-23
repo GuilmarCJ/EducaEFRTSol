@@ -82,7 +82,10 @@ namespace EducaEFRT.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Logout()
         {
-            FormsAuthentication.SignOut();
+            Session.Clear();
+            Session.Abandon();
+            System.Web.Security.FormsAuthentication.SignOut();
+
             return RedirectToAction("Login", "Account");
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using EducaEFRT.Filters;
+using System.Web;
 using System.Web.Mvc;
 
 namespace EducaEFRT
@@ -8,6 +9,8 @@ namespace EducaEFRT
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
+            filters.Add(new NoCacheAttribute());
+            filters.Add(new AuthorizeAttribute());
         }
     }
 }

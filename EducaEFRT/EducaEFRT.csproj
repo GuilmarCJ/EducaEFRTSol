@@ -129,6 +129,7 @@
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\DocenteController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="filters\NoCacheAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -140,9 +141,6 @@
     <Compile Include="Models\DB\EduControlDB.cs" />
     <Compile Include="Models\DB\Repositories\AsistenciaDocenteRepository.cs" />
     <Compile Include="Models\DB\Repositories\AsignacionCursoRepository.cs" />
-    <Compile Include="Models\DB\Repositories\AsistenciaRepository.cs" />
-    <Compile Include="Models\DB\Repositories\EstudianteRepository.cs" />
-    <Compile Include="Models\DB\Repositories\NotasRepository.cs" />
     <Compile Include="Models\DB\Repositories\UsuarioRepository.cs" />
     <Compile Include="Models\Docente.cs" />
     <Compile Include="Models\Estudiante.cs" />
@@ -152,12 +150,9 @@
     <Compile Include="Models\Seccion.cs" />
     <Compile Include="Models\Turno.cs" />
     <Compile Include="Models\Usuario.cs" />
-    <Compile Include="Models\ViewModels\EstudianteNotasViewModel.cs" />
-    <Compile Include="Models\ViewModels\ListaAsistenciaViewModel.cs" />
-    <Compile Include="Models\ViewModels\ListaEstudiantesViewModel.cs" />
-    <Compile Include="Models\ViewModels\NotaEstudianteViewModel.cs" />
+    <Compile Include="Models\ViewModels\AsistenciaEstudianteViewModel.cs" />
+    <Compile Include="Models\ViewModels\NotasViewModel.cs" />
     <Compile Include="Models\ViewModels\RegistrarAsistenciaDocenteViewModel.cs" />
-    <Compile Include="Models\ViewModels\RegistrarNotasViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -216,8 +211,6 @@
     <Content Include="Views\Docente\CursosAsignados.cshtml" />
     <Content Include="Views\Admin\PanelAdmin.cshtml" />
     <Content Include="Views\Docente\RegistrarAsistencia.cshtml" />
-    <Content Include="Views\Docente\ListaEstudiantes.cshtml" />
-    <Content Include="Views\Docente\RegistrarNotas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using EducaEFRT.Filters;
+using EducaEFRT.Models;
 using EducaEFRT.Models.DB;
 using EducaEFRT.Models.DB.Repositories;
 using EducaEFRT.Models.ViewModels;
@@ -79,11 +81,11 @@ namespace EducaEFRT.Controllers
 
                 if (exito)
                 {
-                    TempData["MensajeAsistencia"] = "✅ Asistencia registrada correctamente.";
+                    TempData["Mensaje"] = "✅ Asistencia registrada correctamente.";
                 }
                 else
                 {
-                    TempData["MensajeAsistencia"] = "⚠️ Ya registraste tu asistencia para este curso hoy.";
+                    TempData["Mensaje"] = "⚠️ Ya registraste tu asistencia para este curso hoy.";
                 }
 
                 return RedirectToAction("CursosAsignados");
@@ -91,221 +93,263 @@ namespace EducaEFRT.Controllers
 
             return View(model);
         }
-
-           /* public ActionResult ListaEstudiantes(int idAsignacion)
-            {
-                if (Session["IdUsuario"] == null)
-                    return RedirectToAction("Login", "Account");
-
-                using (var repo = new EstudianteRepository())
-                {
-                    var model = repo.ObtenerListaEstudiantes(idAsignacion);
-
-                    if (model == null)
-                        return HttpNotFound();
-
-                    return View(model);
-                }
-            }*/
-
-
-            public ActionResult ListaEstudiantes(int idAsignacion)
-            {
-                if (Session["IdUsuario"] == null)
-                    return RedirectToAction("Login", "Account");
-
-                using (var repo = new AsistenciaRepository())
-                {
-                    var model = repo.ObtenerListaAsistencia(idAsignacion);
-
-                    if (model == null)
-                        return HttpNotFound();
-
-                    return View(model);
-                }
-            }
-
-        [HttpPost]
-        public ActionResult ListaEstudiantes(ListaAsistenciaViewModel model)
+        //
+        [HttpGet]
+        public JsonResult ObtenerEstudiantesPorAsignacion(int idAsignacion)
         {
-            if (ModelState.IsValid)
+            using (var db = new EduControlDB())
             {
-                try
+                var fechaHoy = DateTime.Today;
+
+                var lista = (from m in db.Matriculas
+                             join e in db.Estudiantes on m.IdEstudiante equals e.IdEstudiante
+                             where m.IdAsignacion == idAsignacion
+                             select new
+                             {
+                                 m.IdMatricula,
+                                 e.CodigoEstudiante,
+                                 e.Apellidos,
+                                 e.Nombres,
+                                 EstadoAsistencia = db.AsistenciasEstudiante
+                                     .Where(a => a.IdMatricula == m.IdMatricula && a.Fecha == fechaHoy)
+                                     .Select(a => a.EstadoAsistencia)
+                                     .FirstOrDefault() ?? "Falto" // Si no hay asistencia registrada, marcar "Faltó"
+                             })
+                             .OrderBy(x => x.Apellidos) // 👈 Aquí se hace el ordenamiento por apellido
+                             .ThenBy(x => x.Nombres)    // 👈 Opcional: ordenar por nombre si hay mismos apellidos
+                             .ToList();
+
+                return Json(lista, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        //
+        [HttpPost]
+        public ActionResult RegistrarAsistenciaEstudiantes(FormCollection form)
+        {
+            var matriculas = form.GetValues("matriculas[]");
+            int registrosInsertados = 0;
+            int registrosActualizados = 0;
+
+            if (matriculas != null)
+            {
+                using (var db = new EduControlDB())
                 {
-                    using (var repo = new AsistenciaRepository())
+                    foreach (var idStr in matriculas)
                     {
-                        // Verificar que hay estudiantes para guardar
-                        if (model.Estudiantes == null || model.Estudiantes.Count == 0)
+                        int idMatricula = int.Parse(idStr);
+                        string key = $"asistencia_{idMatricula}";
+                        string estado = form[key];
+
+                        var asistenciaExistente = db.AsistenciasEstudiante.FirstOrDefault(a =>
+                            a.IdMatricula == idMatricula && a.Fecha == DateTime.Today);
+
+                        if (asistenciaExistente != null)
                         {
-                            ModelState.AddModelError("", "No hay estudiantes para registrar asistencia");
-                            return View(model);
+                            // Actualizar si cambió el estado
+                            if (asistenciaExistente.EstadoAsistencia != estado)
+                            {
+                                asistenciaExistente.EstadoAsistencia = estado;
+                                asistenciaExistente.Hora = DateTime.Now.TimeOfDay;
+                                registrosActualizados++;
+                            }
                         }
-
-                        // Filtrar solo estudiantes con alguna opción seleccionada
-                        var estudiantesConAsistencia = model.Estudiantes
-                            .Where(e => e.Asistio || e.Tardanza || e.Falto)
-                            .ToList();
-
-                        if (estudiantesConAsistencia.Count == 0)
+                        else
                         {
-                            ModelState.AddModelError("", "Debe seleccionar al menos una opción de asistencia");
-                            return View(model);
-                        }
-
-                        if (repo.RegistrarAsistencia(estudiantesConAsistencia))
-                        {
-                            TempData["Mensaje"] = "Asistencia registrada correctamente";
-                            return RedirectToAction("CursosAsignados");
+                            // Insertar nuevo registro
+                            var nuevaAsistencia = new AsistenciaEstudiante
+                            {
+                                IdMatricula = idMatricula,
+                                Fecha = DateTime.Today,
+                                Hora = DateTime.Now.TimeOfDay,
+                                EstadoAsistencia = estado
+                            };
+                            db.AsistenciasEstudiante.Add(nuevaAsistencia);
+                            registrosInsertados++;
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    // Loggear el error
-                    System.Diagnostics.Debug.WriteLine("Error al guardar asistencia: " + ex.ToString());
 
-                    // Mostrar mensaje de error más específico
-                    ModelState.AddModelError("", "Ocurrió un error al guardar la asistencia. Detalles: " + ex.Message);
+                    db.SaveChanges();
                 }
+
+                TempData["Mensaje"] = $"✅ Asistencia de estudiantes actualizada correctamente. " +
+                    $"({registrosInsertados} nuevas, {registrosActualizados} actualizadas)";
             }
             else
             {
-                // Agregar mensaje de error de validación del modelo
-                ModelState.AddModelError("", "Hay errores en los datos enviados");
+                TempData["Mensaje"] = "⚠️ No se seleccionó ningún estudiante.";
             }
 
-            // Si llegamos aquí, hubo un error - recargar los datos necesarios
-            using (var repo = new AsistenciaRepository())
-            {
-                var datosActuales = repo.ObtenerListaAsistencia(model.IdAsignacion);
-                if (datosActuales != null)
-                {
-                    model.NombreCurso = datosActuales.NombreCurso;
-                    model.Seccion = datosActuales.Seccion;
-                    model.Turno = datosActuales.Turno;
-                }
-            }
-
-            return View(model);
+            return RedirectToAction("CursosAsignados");
         }
 
-
-        public ActionResult RegistrarNotas(int idAsignacion, string codigoBusqueda = null)
+        //
+        [HttpGet]
+        public JsonResult BuscarEstudiantePorCodigo(int idAsignacion, string codigo)
         {
-            if (Session["IdUsuario"] == null)
-                return RedirectToAction("Login", "Account");
+            if (string.IsNullOrEmpty(codigo))
+                return Json(new List<object>(), JsonRequestBehavior.AllowGet);
 
             using (var db = new EduControlDB())
             {
-                // 1. Validar que la asignación pertenezca al docente logueado
-                var idUsuario = (int)Session["IdUsuario"];
-                var asignacion = db.AsignacionesCurso
-                    .Include("Curso")
-                    .Include("Seccion")
-                    .Include("Turno")
-                    .FirstOrDefault(a => a.IdAsignacion == idAsignacion &&
-                                       a.Docente.IdUsuario == idUsuario);
+                var fechaHoy = DateTime.Today;
 
-                if (asignacion == null)
-                    return HttpNotFound();
-                var query = db.Matriculas
-            .Where(m => m.IdAsignacion == idAsignacion);
+                var resultado = (from m in db.Matriculas
+                                 join e in db.Estudiantes on m.IdEstudiante equals e.IdEstudiante
+                                 where m.IdAsignacion == idAsignacion && e.CodigoEstudiante == codigo
+                                 select new
+                                 {
+                                     m.IdMatricula,
+                                     e.CodigoEstudiante,
+                                     e.Apellidos,
+                                     e.Nombres,
+                                     EstadoAsistencia = db.AsistenciasEstudiante
+                                         .Where(a => a.IdMatricula == m.IdMatricula && a.Fecha == fechaHoy)
+                                         .Select(a => a.EstadoAsistencia)
+                                         .FirstOrDefault() ?? "Falto"
+                                 }).ToList();
 
-                // Aplicar filtro si hay búsqueda
-                if (!string.IsNullOrEmpty(codigoBusqueda))
-                {
-                    query = query.Where(m => m.Estudiante.CodigoEstudiante.Contains(codigoBusqueda));
-                }
-
-                var estudiantes = query
-                    .Select(m => new EstudianteNotasViewModel
-                    {
-                        IdMatricula = m.IdMatricula,
-                        CodigoEstudiante = m.Estudiante.CodigoEstudiante,
-                        NombreCompleto = m.Estudiante.Apellidos + ", " + m.Estudiante.Nombres,
-                        NotaT1 = db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula) != null
-                                ? db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula).NotaT1
-                                : (decimal?)null,
-                        NotaT2 = db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula) != null
-                                ? db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula).NotaT2
-                                : (decimal?)null,
-                        NotaEF = db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula) != null
-                                ? db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula).NotaEF
-                                : (decimal?)null,
-                        Promedio = db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula) != null
-                                ? db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula).Promedio
-                                : (decimal?)null,
-                        Estado = db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula) != null
-                                ? db.Notas.FirstOrDefault(n => n.IdMatricula == m.IdMatricula).Estado
-                                : "Pendiente"
-                    }).ToList();
-                var model = new RegistrarNotasViewModel
-                {
-                    IdAsignacion = idAsignacion,
-                    NombreCurso = asignacion.Curso.NombreCurso,
-                    Seccion = asignacion.Seccion.NombreSeccion,
-                    Turno = asignacion.Turno.NombreTurno,
-                    Estudiantes = estudiantes,
-                    CodigoBusqueda = codigoBusqueda
-                };
-
-                return View(model);
+                return Json(resultado, JsonRequestBehavior.AllowGet);
             }
         }
 
         [HttpPost]
-        public ActionResult RegistrarNotas(RegistrarNotasViewModel model)
+        public ActionResult RegistrarNotasEstudiantes(FormCollection form)
         {
-            try
+            var matriculas = form.GetValues("matriculas[]");
+            int registrosInsertados = 0;
+            int registrosActualizados = 0;
+
+            if (matriculas != null)
             {
-                if (model.Estudiantes == null || !model.Estudiantes.Any())
+                using (var db = new EduControlDB())
                 {
-                    ModelState.AddModelError("", "No hay estudiantes para registrar notas.");
-                    return View(model);
-                }
-
-                // Validación de rangos
-                foreach (var e in model.Estudiantes)
-                {
-                    if (e.NotaT1 < 0 || e.NotaT1 > 20)
-                        ModelState.AddModelError("", $"Nota T1 inválida para {e.NombreCompleto}");
-                    if (e.NotaT2 < 0 || e.NotaT2 > 20)
-                        ModelState.AddModelError("", $"Nota T2 inválida para {e.NombreCompleto}");
-                    if (e.NotaEF < 0 || e.NotaEF > 20)
-                        ModelState.AddModelError("", $"Nota EF inválida para {e.NombreCompleto}");
-
-                    if (e.NotaT1.HasValue &&
-                    BitConverter.GetBytes(decimal.GetBits(e.NotaT1.Value)[3])[2] > 2)
-                        if (e.NotaT2.HasValue &&
-                        BitConverter.GetBytes(decimal.GetBits(e.NotaT2.Value)[3])[2] > 2)
-                            if (e.NotaEF.HasValue &&
-                            BitConverter.GetBytes(decimal.GetBits(e.NotaEF.Value)[3])[2] > 2)
-                                if (e.Promedio.HasValue &&
-                                BitConverter.GetBytes(decimal.GetBits(e.Promedio.Value)[3])[2] > 2)
-                                {
-                                    ModelState.AddModelError("", "Las notas solo pueden tener hasta 2 decimales");
-                                }
-                }
-
-                if (ModelState.IsValid)
-                {
-                    using (var repo = new NotasRepository())
+                    foreach (var idStr in matriculas)
                     {
-                        if (repo.RegistrarNotas(model.Estudiantes))
+                        int idMatricula = int.Parse(idStr);
+
+                        string keyT1 = $"notaT1_{idMatricula}";
+                        string keyT2 = $"notaT2_{idMatricula}";
+                        string keyEF = $"notaEF_{idMatricula}";
+
+                        bool hayAlgunaNota = !string.IsNullOrWhiteSpace(form[keyT1]) ||
+                                             !string.IsNullOrWhiteSpace(form[keyT2]) ||
+                                             !string.IsNullOrWhiteSpace(form[keyEF]);
+
+                        if (!hayAlgunaNota)
+                            continue; // Ignorar si no hay ninguna nota
+
+                        // Notas individuales (pueden ser nullables)
+                        decimal? notaT1 = decimal.TryParse(form[keyT1], out var t1) ? t1 : (decimal?)null;
+                        decimal? notaT2 = decimal.TryParse(form[keyT2], out var t2) ? t2 : (decimal?)null;
+                        decimal? notaEF = decimal.TryParse(form[keyEF], out var ef) ? ef : (decimal?)null;
+
+                        var notaExistente = db.Notas.FirstOrDefault(n => n.IdMatricula == idMatricula);
+
+                        if (notaExistente != null)
                         {
-                            TempData["MensajeNotas"] = "✅ Notas registradas correctamente.";
-                            return RedirectToAction("CursosAsignados");
+                            // Solo actualizar si algo cambió
+                            if (notaExistente.NotaT1 != notaT1 ||
+                                notaExistente.NotaT2 != notaT2 ||
+                                notaExistente.NotaEF != notaEF)
+                            {
+                                notaExistente.NotaT1 = notaT1;
+                                notaExistente.NotaT2 = notaT2;
+                                notaExistente.NotaEF = notaEF;
+                                registrosActualizados++;
+                            }
+                        }
+                        else
+                        {
+                            var nuevaNota = new Notas
+                            {
+                                IdMatricula = idMatricula,
+                                NotaT1 = notaT1,
+                                NotaT2 = notaT2,
+                                NotaEF = notaEF,
+                                Estado = "Pendiente" // se actualizará luego
+                            };
+                            db.Notas.Add(nuevaNota);
+                            registrosInsertados++;
                         }
                     }
+
+                    db.SaveChanges();
                 }
-                return View(model);
+
+                TempData["Mensaje"] = $"✅ Registro de notas completado. ({registrosInsertados} nuevas, {registrosActualizados} actualizadas)";
             }
-            catch (Exception ex)
+            else
             {
-                ModelState.AddModelError("", "Error crítico: " + ex.Message);
-                return View(model);
+                TempData["Mensaje"] = "⚠️ No se seleccionó ningún estudiante para registrar notas.";
+            }
+
+            return RedirectToAction("CursosAsignados");
+        }
+
+
+        [HttpGet]
+        public JsonResult ObtenerNotasPorAsignacion(int idAsignacion)
+        {
+            using (var db = new EduControlDB())
+            {
+                var lista = (from m in db.Matriculas
+                             join e in db.Estudiantes on m.IdEstudiante equals e.IdEstudiante
+                             where m.IdAsignacion == idAsignacion
+                             join n in db.Notas on m.IdMatricula equals n.IdMatricula into notasGroup
+                             from n in notasGroup.DefaultIfEmpty() // left join para mostrar incluso si no hay notas aún
+                             select new
+                             {
+                                 m.IdMatricula,
+                                 e.CodigoEstudiante,
+                                 e.Apellidos,
+                                 e.Nombres,
+                                 NotaT1 = n != null ? n.NotaT1 : (decimal?)null,
+                                 NotaT2 = n != null ? n.NotaT2 : (decimal?)null,
+                                 NotaEF = n != null ? n.NotaEF : (decimal?)null,
+                                 Promedio = n != null ? n.Promedio : (decimal?)null,
+                                 Estado = n != null ? n.Estado : "Pendiente"
+                             })
+                             .OrderBy(x => x.Apellidos)
+                             .ThenBy(x => x.Nombres)
+                             .ToList();
+
+                return Json(lista, JsonRequestBehavior.AllowGet);
             }
         }
+
+        [HttpGet]
+        public JsonResult BuscarEstudiantePorCodigoNotas(int idAsignacion, string codigo)
+        {
+            if (string.IsNullOrEmpty(codigo))
+                return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+            using (var db = new EduControlDB())
+            {
+                var resultado = (from m in db.Matriculas
+                                 join e in db.Estudiantes on m.IdEstudiante equals e.IdEstudiante
+                                 where m.IdAsignacion == idAsignacion && e.CodigoEstudiante == codigo
+                                 join n in db.Notas on m.IdMatricula equals n.IdMatricula into notaJoin
+                                 from n in notaJoin.DefaultIfEmpty()
+                                 select new
+                                 {
+                                     m.IdMatricula,
+                                     e.CodigoEstudiante,
+                                     e.Apellidos,
+                                     e.Nombres,
+                                     T1 = n != null ? n.NotaT1 : (decimal?)null,
+                                     T2 = n != null ? n.NotaT2 : (decimal?)null,
+                                     EF = n != null ? n.NotaEF : (decimal?)null,
+                                     Promedio = n != null ? n.Promedio : (decimal?)null,
+                                     EstadoNota = n != null ? n.Estado : "Pendiente"
+                                 }).ToList();
+
+                return Json(resultado, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+
 
 
     }

@@ -688,15 +688,15 @@
                         const required = estado ? "" : "required"; // Solo si aún no tiene asistencia
 
                         const fila = `
-                                                             <tr>
-                                                                 <td>${est.CodigoEstudiante}</td>
-                                                                 <td>${est.Apellidos}</td>
-                                                                 <td>${est.Nombres}</td>
-                                                                 <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Asistio" ${checkedAsistio} ${required}></td>
-                                                                 <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Tardanza" ${checkedTardanza}></td>
-                                                                 <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Falto" ${checkedFalto}></td>
-                                                                 <input type="hidden" name="matriculas[]" value="${est.IdMatricula}">
-                                                             </tr>`;
+                                                                 <tr>
+                                                                     <td>${est.CodigoEstudiante}</td>
+                                                                     <td>${est.Apellidos}</td>
+                                                                     <td>${est.Nombres}</td>
+                                                                     <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Asistio" ${checkedAsistio} ${required}></td>
+                                                                     <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Tardanza" ${checkedTardanza}></td>
+                                                                     <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Falto" ${checkedFalto}></td>
+                                                                     <input type="hidden" name="matriculas[]" value="${est.IdMatricula}">
+                                                                 </tr>`;
                         tbody.insertAdjacentHTML('beforeend', fila);
                     });
 
@@ -738,15 +738,15 @@
                         const required = estado ? "" : "required";
 
                         const fila = `
-                                                             <tr>
-                                                                 <td>${est.CodigoEstudiante}</td>
-                                                                 <td>${est.Apellidos}</td>
-                                                                 <td>${est.Nombres}</td>
-                                                                 <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Asistio" ${checkedAsistio} ${required}></td>
-                                                                 <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Tardanza" ${checkedTardanza}></td>
-                                                                 <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Falto" ${checkedFalto}></td>
-                                                                 <input type="hidden" name="matriculas[]" value="${est.IdMatricula}">
-                                                             </tr>`;
+                                                                 <tr>
+                                                                     <td>${est.CodigoEstudiante}</td>
+                                                                     <td>${est.Apellidos}</td>
+                                                                     <td>${est.Nombres}</td>
+                                                                     <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Asistio" ${checkedAsistio} ${required}></td>
+                                                                     <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Tardanza" ${checkedTardanza}></td>
+                                                                     <td><input type="radio" name="asistencia_${est.IdMatricula}" value="Falto" ${checkedFalto}></td>
+                                                                     <input type="hidden" name="matriculas[]" value="${est.IdMatricula}">
+                                                                 </tr>`;
 
                         tbody.insertAdjacentHTML('beforeend', fila);
                     });
@@ -782,17 +782,17 @@
 
 
                         const fila = `
-                     <tr>
-                         <td>${est.CodigoEstudiante}</td>
-                         <td>${est.Apellidos}</td>
-                         <td>${est.Nombres}</td>
-                         <td><input type="number" min="0" max="20" step="0.5" name="notaT1_${est.IdMatricula}" value="${t1}" class="form-control"></td>
-                         <td><input type="number" min="0" max="20" step="0.5" name="notaT2_${est.IdMatricula}" value="${t2}" class="form-control"></td>
-                         <td><input type="number" min="0" max="20" step="0.5" name="notaEF_${est.IdMatricula}" value="${ef}" class="form-control"></td>
-                         <td><input type="text" value="${promedio}" class="form-control" readonly></td>
-                         <td><input type="text" value="${estado}" class="form-control" readonly></td>
-                         <input type="hidden" name="matriculas[]" value="${est.IdMatricula}">
-                     </tr>`;
+                         <tr>
+                             <td>${est.CodigoEstudiante}</td>
+                             <td>${est.Apellidos}</td>
+                             <td>${est.Nombres}</td>
+                             <td><input type="number" min="0" max="20" step="0.5" name="notaT1_${est.IdMatricula}" value="${t1}" class="form-control"></td>
+                             <td><input type="number" min="0" max="20" step="0.5" name="notaT2_${est.IdMatricula}" value="${t2}" class="form-control"></td>
+                             <td><input type="number" min="0" max="20" step="0.5" name="notaEF_${est.IdMatricula}" value="${ef}" class="form-control"></td>
+                             <td><input type="text" value="${promedio}" class="form-control" readonly></td>
+                             <td><input type="text" value="${estado}" class="form-control" readonly></td>
+                             <input type="hidden" name="matriculas[]" value="${est.IdMatricula}">
+                         </tr>`;
                         tbody.insertAdjacentHTML('beforeend', fila);
                     });
 
@@ -834,17 +834,17 @@
                         const estado = est.EstadoNota ?? "";
 
                         const fila = `
-                     <tr>
-                         <td>${est.CodigoEstudiante}</td>
-                         <td>${est.Apellidos}</td>
-                         <td>${est.Nombres}</td>
-                         <td><input type="number" min="0" max="20" step="0.5" name="notaT1_${est.IdMatricula}" value="${t1}" class="form-control"></td>
-                         <td><input type="number" min="0" max="20" step="0.5" name="notaT2_${est.IdMatricula}" value="${t2}" class="form-control"></td>
-                         <td><input type="number" min="0" max="20" step="0.5" name="notaEF_${est.IdMatricula}" value="${ef}" class="form-control"></td>
-                         <td><input type="text" value="${promedio}" class="form-control" readonly></td>
-                         <td><input type="text" value="${estado}" class="form-control" readonly></td>
-                         <input type="hidden" name="matriculas[]" value="${est.IdMatricula}">
-                     </tr>`;
+                         <tr>
+                             <td>${est.CodigoEstudiante}</td>
+                             <td>${est.Apellidos}</td>
+                             <td>${est.Nombres}</td>
+                             <td><input type="number" min="0" max="20" step="0.5" name="notaT1_${est.IdMatricula}" value="${t1}" class="form-control"></td>
+                             <td><input type="number" min="0" max="20" step="0.5" name="notaT2_${est.IdMatricula}" value="${t2}" class="form-control"></td>
+                             <td><input type="number" min="0" max="20" step="0.5" name="notaEF_${est.IdMatricula}" value="${ef}" class="form-control"></td>
+                             <td><input type="text" value="${promedio}" class="form-control" readonly></td>
+                             <td><input type="text" value="${estado}" class="form-control" readonly></td>
+                             <input type="hidden" name="matriculas[]" value="${est.IdMatricula}">
+                         </tr>`;
                         tbody.insertAdjacentHTML('beforeend', fila);
                     });
 
@@ -858,5 +858,36 @@
         });
 
     </script>
+
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @{
+        var mensaje = TempData["Mensaje"] as string;
+        var esExito = mensaje != null && mensaje.Contains("✅");
+        var icono = esExito ? "success" : "warning";
+        var titulo = esExito ? "¡Éxito!" : "Atención";
+        var mensajeLimpio = mensaje?
+            .Replace("✅", "")
+            .Replace("⚠️", "")
+            .Replace("\"", "\\\"")
+            .Trim();
+    }
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <script>
+        Swal.fire({
+            icon: '@icono',
+            title: '@titulo',
+            html: "@mensajeLimpio",
+            confirmButtonText: 'Aceptar'
+        });
+        </script>
+    }
+
+
+
 </body>
 </html>
